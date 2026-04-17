@@ -6,8 +6,17 @@ import sys
 import requests # pyright: ignore[reportMissingModuleSource]
 
 from discord.ext import commands
+from discord import app_commands
 
 # Configs
+
+# Loads the configs from the files in the config dir. the startup process should insure that they exist
+# 
+# They load as dict
+#
+#  confg/
+#      - *.json
+
 
 with open('config/config.json', 'r') as file:
     config = json.load(file)
@@ -20,12 +29,7 @@ with open('config/servers.json', 'r') as file:
     
 server_fetch_time = []
 
-def reload_config():
-    with open('config/config.json', 'r') as file:
-        config = json.load(file)
-        
-    with open('config/servers.json', 'r') as file:
-        servers = json.load(file)
+DISCORD_SERVER_ID = discord.Object(config["GUILD_ID"])
 
 # Intents stuff
 
@@ -44,14 +48,15 @@ client = discord.Client
 
 
 
+
+
 # / Command settup
 
-bot.tree.command(name="info", description="Gives basic info about the bot")
-async def ping_command(interaction: discord.Interaction):
-    print("Running Info")
-    await interaction.response.send_message("Made by TVS vin :wave:", ephemeral=True)
-    await bot.tree.sync()
-    
+@bot.tree.command(name="test", description="Gives basic info about the bot", guild=DISCORD_SERVER_ID)
+async def test_command(ctx: discord.Interaction):
+    print('running test command')
+    await ctx.response.send_message("Made by TVS vin :wave:")
+    pass
 
 
 # Sets the data for the server requested and stores it. 
@@ -65,27 +70,13 @@ def server_data_get(server , isInList):
             json.dump(server_data,f, indent=4)
         return_obj = server_data["motd"]
         return return_obj["raw"]
-
+    
 
 # Restarts things (Clean reload)
 
 def restart_program():
     python = sys.executable
     os.execl(python, python, *sys.argv)
-    
-
-# Sets up command base
-
-@bot.event
-async def on_ready():
-    print('TVS MC status online')
-    await startup_message(config["MESSAGE_USER_ON_STARTUP"])
-    await profile_settup()
-    
-
-@bot.event
-async def on_message(message):
-    await manual_commands(message,config["MANUAL_COMMANDS_ENABLED"])
     
 
 # Sets up the bots profile
@@ -120,6 +111,14 @@ def status_handler(config):
     else:
         return discord.Status.online
 
+
+# Reloads the config file
+def reload_config():
+    with open('config/config.json', 'r') as file:
+        config = json.load(file)
+        
+    with open('config/servers.json', 'r') as file:
+        servers = json.load(file)
 
 # Manual commands, can be enabled in config
 
@@ -168,5 +167,27 @@ async def startup_message(enabled:bool):
         except Exception as e:
             print(f"Error sending DM to user ID {config["BOT_OWNER_USER_ID"]}. Details: {e}")
     
+# Startup stuff
+
+@bot.event
+async def on_ready():
+    print('TVS MC status online')
+    await startup_message(config["MESSAGE_USER_ON_STARTUP"])
+    await profile_settup()
+    
+    try:
+        guild = DISCORD_SERVER_ID
+        synced = await bot.tree.sync()
+        print(f'Synced {len(synced)} commands to guild {guild.id}')
+        
+    except Exception as e:
+        print(f'Error syncing commands | {e}')
+
+@bot.event
+async def on_message(message):
+    await manual_commands(message,config["MANUAL_COMMANDS_ENABLED"])
+    
+
+
 
 bot.run(token["DISCORD_BOT_TOKEN"])
