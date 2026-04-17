@@ -1,0 +1,14 @@
+{
+    "START_OWNER_NOTIFICATION_MESSAGE_CONTENTS": "TVS MC Server status online",
+    "BOT_STATUS": "online",
+
+    "MESSAGE_USER_ON_STARTUP": "True",
+    "BOT_OWNER_USER_ID": null,
+    
+    "PREFIX": "!",
+    "MANUAL_COMMANDS_ENABLED": "True",
+    "PREFIX_LEGACY": "!",
+
+    "STATUS_API": "https://api.mcsrvstat.us/3/"
+
+}
