@@ -52,7 +52,7 @@ client = discord.Client
 
 # / Command settup
 
-@bot.tree.command(name="test", description="Gives basic info about the bot", guild=DISCORD_SERVER_ID)
+@bot.tree.command(name="test", description="Gives basic info about the bot")
 async def test_command(ctx: discord.Interaction):
     print('running test command')
     await ctx.response.send_message("Made by TVS vin :wave:")
@@ -176,9 +176,8 @@ async def on_ready():
     await profile_settup()
     
     try:
-        guild = DISCORD_SERVER_ID
         synced = await bot.tree.sync()
-        print(f'Synced {len(synced)} commands to guild {guild.id}')
+        print(f'Synced {len(synced)} commands globally')
         
     except Exception as e:
         print(f'Error syncing commands | {e}')
