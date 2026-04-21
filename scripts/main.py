@@ -5,8 +5,11 @@ import os
 import sys
 import requests # pyright: ignore[reportMissingModuleSource]
 
+import dataBuilder
+
 from discord.ext import commands
 from discord import app_commands
+from typing import Optional
 
 # Configs
 
@@ -50,12 +53,40 @@ client = discord.Client
 
 
 
-# / Command settup
+# / Command settup - Debug
+
+@bot.tree.command(name="sync", description="Syncs the commands to discord forcefully")
+async def sync_command(ctx: discord.Interaction):
+    print('Running sync commands command')
+    try:
+        synced = await bot.tree.sync()
+        response = print(f'Synced {len(synced)} commands globally')
+        response = str(response)
+        await ctx.response.send_message("{response}")
+        
+    except Exception as e:
+        response = print(f'Error syncing commands | {e}')
+        response = str(response)
+        await ctx.response.send_message("{response}")
+    
+@bot.tree.command(name="restart", description="Restarts the bot")
+async def restart_command(ctx: discord.Interaction):
+    print('Running restart command')
+    await ctx.response.send_message('Restarting Now')
+    restart_program()
 
 @bot.tree.command(name="test", description="Gives basic info about the bot")
 async def test_command(ctx: discord.Interaction):
-    print('running test command')
-    await ctx.response.send_message("Made by TVS vin :wave:")
+    print('Running test command')
+    await ctx.response.send_message("Made by TVS vin \n\n :wave:")
+    pass
+    
+@bot.tree.command(name="message_test", description="Tests the message gen")
+async def test_command_message_gen(ctx:discord.Interaction , type:int, server:int, icon:bool):
+    print('Running test command - Message gen')
+    print(f"INPUT | {type} | {server} | {icon}")
+    message = await dataBuilder.build_info_message(ctx,type,server,icon)
+    await ctx.response.send_message(message)
     pass
 
 
@@ -65,7 +96,6 @@ def server_data_get(server , isInList):
         server_path = "server-data/" + servers[server] + ".json"
         server_data_raw = requests.request("GET",config["STATUS_API"] + servers[server],json=True)
         server_data = server_data_raw.json()
-        print(str(server_data))
         with open(server_path, "w") as f:
             json.dump(server_data,f, indent=4)
         return_obj = server_data["motd"]
