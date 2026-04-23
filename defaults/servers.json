@@ -1,6 +1,8 @@
 {
     "FEATURED_SERVER": "-1",
 
+    "TEMP_SERVER":"unset",
+
     "-1": "ONBOARDING MODE",
     "0": "Status Checker by TVS vin"
 

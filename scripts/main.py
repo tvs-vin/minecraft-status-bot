@@ -49,11 +49,41 @@ client = discord.Client
 
 
 
+# / Command Setup - Main
 
+@bot.tree.command(name="quick-info", description="Gets info on the selected server")
+async def info_command_main(ctx: discord.Interaction, ip: str, cache: Optional[bool] = False):
+    print('Running quick info command')
+    try:
+        if(cache):
+            # MAKE A FUNC THAT ADDED IN SERVERS TO SERVERS.JSON
+            print("WIP")
+            
+        else:
+            # Does not cache, just gets data in local var that gets deleted instantly
+            server_data_raw = requests.request("GET",str(f"{config["STATUS_API"]}{ip}"),json=True)
+            server_data = server_data_raw.json()
+            message  = await dataBuilder.cacheless_server_databuilder( 2, ip, server_data, False)
+            await ctx.response.send_message(message)
+        
+    except Exception as e:
+        await ctx.response.send_message(f'ERROR - Check logs | {e}')
 
+@bot.tree.command(name="settings", description="Sets up values for MC server status")
+async def settings_command_main(ctx: discord.Interaction, setting: str, param: str):
+    print(f'Running settings command | {setting} | {param} |')
+    try:
+        new_config = config
+        new_config[setting] = param
+        new_config_json = json.dumps(new_config, indent=4)
+        with open(config/config.json, "w") as f:
+            json.dump(new_config_json,f)
+        
+    except Exception as e:
+        await ctx.response.send_message(f"ERROR - Check logs | {e}")
+    
 
-
-# / Command settup - Debug
+# / Command settup - Debug - Ommit this section for final build
 
 @bot.tree.command(name="sync", description="Syncs the commands to discord forcefully")
 async def sync_command(ctx: discord.Interaction):
@@ -85,21 +115,29 @@ async def test_command(ctx: discord.Interaction):
 async def test_command_message_gen(ctx:discord.Interaction , type:int, server:int, icon:bool):
     print('Running test command - Message gen')
     print(f"INPUT | {type} | {server} | {icon}")
-    message = await dataBuilder.build_info_message(ctx,type,server,icon)
+    message = await dataBuilder.build_info_message(ctx,type,str(server),icon)
     await ctx.response.send_message(message)
     pass
+
+@bot.tree.command(name="manual_fetch", description="Manually fetches the specified server below")
+async def manual_fetch_command(ctx: discord.Interaction, server:int):
+    print('Running manual server data fetch command')
+    print(f'INPUT | {server}')
+    server_data_get(server,True)
+    await ctx.response.send_message(f'Fetched server {server}')
+    
 
 
 # Sets the data for the server requested and stores it. 
 def server_data_get(server , isInList):
     if(isInList):
-        server_path = "server-data/" + servers[server] + ".json"
-        server_data_raw = requests.request("GET",config["STATUS_API"] + servers[server],json=True)
+        server_path = str(f"server-data/{servers[str(server)]}.json")
+        server_data_raw = requests.request("GET",str(f"{config["STATUS_API"]}{servers[str(server)]}"),json=True)
         server_data = server_data_raw.json()
         with open(server_path, "w") as f:
             json.dump(server_data,f, indent=4)
         return_obj = server_data["motd"]
-        return return_obj["raw"]
+        return return_obj["raw"][0]
     
 
 # Restarts things (Clean reload)
