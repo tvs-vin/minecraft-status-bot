@@ -4,11 +4,11 @@ import json
 import os
 import sys
 import requests # pyright: ignore[reportMissingModuleSource]
+import copy
 
 import dataBuilder
 
 from discord.ext import commands
-from discord import app_commands
 from typing import Optional
 
 # Configs
@@ -53,7 +53,7 @@ client = discord.Client
 
 @bot.tree.command(name="quick-info", description="Gets info on the selected server")
 async def info_command_main(ctx: discord.Interaction, ip: str, cache: Optional[bool] = False):
-    print('Running quick info command')
+    print('\nRunning quick info command')
     try:
         if(cache):
             # MAKE A FUNC THAT ADDED IN SERVERS TO SERVERS.JSON
@@ -71,13 +71,18 @@ async def info_command_main(ctx: discord.Interaction, ip: str, cache: Optional[b
 
 @bot.tree.command(name="settings", description="Sets up values for MC server status")
 async def settings_command_main(ctx: discord.Interaction, setting: str, param: str):
-    print(f'Running settings command | {setting} | {param} |')
+    print(f'\nRunning settings command | {setting} | {param} |')
     try:
-        new_config = config
+        new_config = copy.deepcopy(config)
         new_config[setting] = param
-        new_config_json = json.dumps(new_config, indent=4)
-        with open(config/config.json, "w") as f:
-            json.dump(new_config_json,f)
+        try:
+            with open("config/config.json", 'w') as f:
+                json.dump(new_config, f, indent=4)
+            
+        except IOError as e:
+            await ctx.response.send_message(f'ERROR - Chech logs | {e}')
+            
+        await ctx.response.send_message(f'Updated {setting} to {param}')
         
     except Exception as e:
         await ctx.response.send_message(f"ERROR - Check logs | {e}")
