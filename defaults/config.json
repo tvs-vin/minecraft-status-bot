@@ -1,6 +1,7 @@
 {
     "VERSION": "V0.5.0",
     "DEBUG": "False",
+    "FIRST_LAUNCH": "False",
 
     "START_OWNER_NOTIFICATION_MESSAGE_CONTENTS": "TVS MC Server status online",
     "TAGLINE": "MC Status bot",
