@@ -55,7 +55,7 @@ async def info_command_main(
     ):
     
     print('\nRunning quick info command')
-    if(embed == False   ):
+    if(embed == False):
         try:
             if(cache):
                 # MAKE A FUNC THAT ADDED IN SERVERS TO SERVERS.JSON
