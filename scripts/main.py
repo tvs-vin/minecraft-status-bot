@@ -31,9 +31,6 @@ with open('config/servers.json', 'r') as file:
     servers = json.load(file)
     
 server_fetch_time = []
-
-DISCORD_SERVER_ID = discord.Object(config["GUILD_ID"])
-
 # Intents stuff
 
 intents = discord.Intents.default()
@@ -46,31 +43,69 @@ bot = commands.Bot(command_prefix=config["PREFIX"], description="Check on your s
 client = discord.Client
 
 
-
-
-
 # / Command Setup - Main
 
 @bot.tree.command(name="quick-info", description="Gets info on the selected server")
-async def info_command_main(ctx: discord.Interaction, ip: str, cache: Optional[bool] = False):
+async def info_command_main(
+    ctx: discord.Interaction, 
+    ip: str, 
+    cache: Optional[bool] = False,
+    embed: Optional[bool] = True,
+    image: Optional[bool] = True    ,
+    ):
+    
     print('\nRunning quick info command')
-    try:
-        if(cache):
-            # MAKE A FUNC THAT ADDED IN SERVERS TO SERVERS.JSON
-            print("WIP")
-            
-        else:
-            # Does not cache, just gets data in local var that gets deleted instantly
-            server_data_raw = requests.request("GET",str(f"{config["STATUS_API"]}{ip}"),json=True)
-            server_data = server_data_raw.json()
-            message  = await dataBuilder.cacheless_server_databuilder( 2, ip, server_data, False)
-            await ctx.response.send_message(message)
-        
-    except Exception as e:
-        await ctx.response.send_message(f'ERROR - Check logs | {e}')
+    if(embed == False   ):
+        try:
+            if(cache):
+                # MAKE A FUNC THAT ADDED IN SERVERS TO SERVERS.JSON
+                print("WIP")
+
+            else:
+                # Does not cache, just gets data in local var that gets deleted instantly
+                server_data_raw = requests.request("GET",str(f"{config["STATUS_API"]}{ip}"),json=True)
+                server_data = server_data_raw.json()
+                message  = await dataBuilder.cacheless_server_databuilder( 2, ip, server_data, False)
+                await ctx.response.send_message(message)
+
+        except Exception as e:
+            await ctx.response.send_message(f'ERROR - Check logs | {e}')
+    else:
+        try:
+            if(cache):
+                # MAKE A FUNC THAT ADDED IN SERVERS TO SERVERS.JSON
+                print("WIP")
+
+            else:
+                # Does not cache, just gets data in local var that gets deleted instantly
+                server_data_raw = requests.request("GET",str(f"{config["STATUS_API"]}{ip}"),json=True)
+                server_data = server_data_raw.json()
+                image_path="-1"
+                if(image):
+                    url = (f'{config["STATUS_API_IMAGE"]}{ip}')
+                    resp = requests.get(url)
+                    if(resp.status_code == 200):
+                        with open(f'server-data/image-cache/{ip}.png', 'wb') as f:
+                                for chunk in resp.iter_content(chunk_size=8192):
+                                    f.write(chunk)
+                                image_path = (f'server-data/image-cache/{ip}.png')
+                    elif(resp.status_code == 404):
+                        image_path = "-1"
+                motd = server_data["motd"]["clean"][0]
+                message = await dataBuilder.embed_main(ctx=ctx,title=ip,disc=motd,type=2,server_data=server_data,image=image_path,returnEmb=True)
+                if type(message) is discord.Embed:
+                    await ctx.response.send_message(embed = message) # pyright: ignore[reportArgumentType]
+
+        except Exception as e:
+            await ctx.response.send_message(f'ERROR - Check logs | {e}')
 
 @bot.tree.command(name="settings", description="Sets up values for MC server status")
-async def settings_command_main(ctx: discord.Interaction, setting: str, param: str):
+async def settings_command_main(
+    ctx: discord.Interaction, 
+    setting: str, 
+    param: str
+    ):
+    
     print(f'\nRunning settings command | {setting} | {param} |')
     try:
         new_config = copy.deepcopy(config)
@@ -89,9 +124,22 @@ async def settings_command_main(ctx: discord.Interaction, setting: str, param: s
     
 
 # / Command settup - Debug - Ommit this section for final build
+@bot.tree.command(name="embed-test", description="Test the embed gen")
+async def embed_test_command(
+    ctx: discord.Interaction, 
+    title:str, 
+    disc:str, 
+    color:int
+    ):
+    
+    print(f'Running embed test command | {title} | {disc} |')
+    await dataBuilder.embed_main(ctx,title,disc,color, type= 1)
 
 @bot.tree.command(name="sync", description="Syncs the commands to discord forcefully")
-async def sync_command(ctx: discord.Interaction):
+async def sync_command(
+    ctx: discord.Interaction
+    ):
+    
     print('Running sync commands command')
     try:
         synced = await bot.tree.sync()
@@ -134,7 +182,11 @@ async def manual_fetch_command(ctx: discord.Interaction, server:int):
 
 
 # Sets the data for the server requested and stores it. 
-def server_data_get(server , isInList):
+def server_data_get(
+    server, 
+    isInList
+    ):
+    
     if(isInList):
         server_path = str(f"server-data/{servers[str(server)]}.json")
         server_data_raw = requests.request("GET",str(f"{config["STATUS_API"]}{servers[str(server)]}"),json=True)
@@ -172,7 +224,10 @@ async def profile_settup():
 
 # Returns value based on config file. 1 - online 2 - away 3 - invis 4 - dnd
 
-def status_handler(config):
+def status_handler(
+    config
+    ):
+    
     if(config == "online"):
         return discord.Status.online
     elif(config == "away"):
@@ -195,7 +250,11 @@ def reload_config():
 
 # Manual commands, can be enabled in config
 
-async def manual_commands(message,enabled):
+async def manual_commands(
+    message,
+    enabled
+    ):
+    
     if(enabled):
         if message.author == client.user:
             return
@@ -229,7 +288,10 @@ async def manual_commands(message,enabled):
 
 # if configured to, messages user on startup
 
-async def startup_message(enabled:bool):
+async def startup_message(
+    enabled:bool
+    ):
+    
     if(enabled):
         try:
             user = await bot.fetch_user(config["BOT_OWNER_USER_ID"])

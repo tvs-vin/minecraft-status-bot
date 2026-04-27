@@ -1,5 +1,9 @@
 {
+    "VERSION": "V0.5.0",
+    "DEBUG": "False",
+
     "START_OWNER_NOTIFICATION_MESSAGE_CONTENTS": "TVS MC Server status online",
+    "TAGLINE": "MC Status bot",
     "BOT_STATUS": "online",
 
     "MESSAGE_USER_ON_STARTUP": "True",
@@ -9,6 +13,8 @@
     "MANUAL_COMMANDS_ENABLED": "True",
     "PREFIX_LEGACY": "!",
 
-    "STATUS_API": "https://api.mcsrvstat.us/3/"
+    "STATUS_API": "https://api.mcsrvstat.us/3/",
+    "STATUS_API_IMAGE": "https://api.mcsrvstat.us/icon/"
+
 
 }
