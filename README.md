@@ -1,7 +1,24 @@
 # minecraft-status-bot
 A modular status bot that checks for if a server is up, shows stats abt it, and is configurable from a file or commands
 
-# How it works
-You should start it with the script **start.py**
+## Set-up
 
-In start.py, it checks that the files exist, and that the crtitcal config file of **token.json** has a token in it. It will then run **main.py** 
+No matter how you decide to host the bot, a few bits of basic settup are needed. They are explained below
+
+Discord Token - You get this from the discord developer portal.
+
+The bot also needs the the intents "Presence Intent" and "Message Content Intent"
+
+![Screenshot showing the discord developer portals "intents" section with the nessesary options selected](docs/images/image.png)
+
+The bot will also need to have its default install settings, `scopes` and `permissions`
+
+![Screenshot showing the install settings required for the bot to function](/docs/images/discord-install-settings.png)
+
+The required 
+
+### Docker
+
+For the docker container, you can set up the 
+
+### Uncontainered
