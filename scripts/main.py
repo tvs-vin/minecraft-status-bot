@@ -51,7 +51,7 @@ async def info_command_main(
     ip: str, 
     cache: Optional[bool] = False,
     embed: Optional[bool] = True,
-    image: Optional[bool] = True    ,
+    image: Optional[bool] = True,
     ):
     
     print('\nRunning quick info command')
@@ -123,62 +123,64 @@ async def settings_command_main(
         await ctx.response.send_message(f"ERROR - Check logs | {e}")
     
 
-# / Command settup - Debug - Ommit this section for final build
-@bot.tree.command(name="embed-test", description="Test the embed gen")
-async def embed_test_command(
-    ctx: discord.Interaction, 
-    title:str, 
-    disc:str, 
-    color:int
-    ):
-    
-    print(f'Running embed test command | {title} | {disc} |')
-    await dataBuilder.embed_main(ctx,title,disc,color, type= 1)
+# / Command settup - Debug 
 
-@bot.tree.command(name="sync", description="Syncs the commands to discord forcefully")
-async def sync_command(
-    ctx: discord.Interaction
-    ):
-    
-    print('Running sync commands command')
-    try:
-        synced = await bot.tree.sync()
-        response = print(f'Synced {len(synced)} commands globally')
-        response = str(response)
-        await ctx.response.send_message("{response}")
-        
-    except Exception as e:
-        response = print(f'Error syncing commands | {e}')
-        response = str(response)
-        await ctx.response.send_message("{response}")
-    
-@bot.tree.command(name="restart", description="Restarts the bot")
-async def restart_command(ctx: discord.Interaction):
-    print('Running restart command')
-    await ctx.response.send_message('Restarting Now')
-    restart_program()
+if(config["DEBUG"] == "True"):
+    @bot.tree.command(name="embed-test", description="Test the embed gen")
+    async def embed_test_command(
+        ctx: discord.Interaction, 
+        title:str, 
+        disc:str, 
+        color:int
+        ):
 
-@bot.tree.command(name="test", description="Gives basic info about the bot")
-async def test_command(ctx: discord.Interaction):
-    print('Running test command')
-    await ctx.response.send_message("Made by TVS vin \n\n :wave:")
-    pass
-    
-@bot.tree.command(name="message_test", description="Tests the message gen")
-async def test_command_message_gen(ctx:discord.Interaction , type:int, server:int, icon:bool):
-    print('Running test command - Message gen')
-    print(f"INPUT | {type} | {server} | {icon}")
-    message = await dataBuilder.build_info_message(ctx,type,str(server),icon)
-    await ctx.response.send_message(message)
-    pass
+        print(f'Running embed test command | {title} | {disc} |')
+        await dataBuilder.embed_main(ctx,title,disc,color, type= 1)
 
-@bot.tree.command(name="manual_fetch", description="Manually fetches the specified server below")
-async def manual_fetch_command(ctx: discord.Interaction, server:int):
-    print('Running manual server data fetch command')
-    print(f'INPUT | {server}')
-    server_data_get(server,True)
-    await ctx.response.send_message(f'Fetched server {server}')
-    
+    @bot.tree.command(name="sync", description="Syncs the commands to discord forcefully")
+    async def sync_command(
+        ctx: discord.Interaction
+        ):
+
+        print('Running sync commands command')
+        try:
+            synced = await bot.tree.sync()
+            response = print(f'Synced {len(synced)} commands globally')
+            response = str(response)
+            await ctx.response.send_message("{response}")
+
+        except Exception as e:
+            response = print(f'Error syncing commands | {e}')
+            response = str(response)
+            await ctx.response.send_message("{response}")
+
+    @bot.tree.command(name="restart", description="Restarts the bot")
+    async def restart_command(ctx: discord.Interaction):
+        print('Running restart command')
+        await ctx.response.send_message('Restarting Now')
+        restart_program()
+
+    @bot.tree.command(name="test", description="Gives basic info about the bot")
+    async def test_command(ctx: discord.Interaction):
+        print('Running test command')
+        await ctx.response.send_message("Made by TVS vin \n\n :wave:")
+        pass
+
+    @bot.tree.command(name="message_test", description="Tests the message gen")
+    async def test_command_message_gen(ctx:discord.Interaction , type:int, server:int, icon:bool):
+        print('Running test command - Message gen')
+        print(f"INPUT | {type} | {server} | {icon}")
+        message = await dataBuilder.build_info_message(ctx,type,str(server),icon)
+        await ctx.response.send_message(message)
+        pass
+
+    @bot.tree.command(name="manual_fetch", description="Manually fetches the specified server below")
+    async def manual_fetch_command(ctx: discord.Interaction, server:int):
+        print('Running manual server data fetch command')
+        print(f'INPUT | {server}')
+        server_data_get(server,True)
+        await ctx.response.send_message(f'Fetched server {server}')
+
 
 
 # Sets the data for the server requested and stores it. 
